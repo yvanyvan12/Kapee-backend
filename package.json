@@ -4,9 +4,11 @@
   "description": " learn node typscript",
   "main": "script.js",
   "scripts": {
-    "start": "ts-node index.ts",
-    "dev": "nodemon --exec ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+
   },
   "author": "",
   "license": "ISC",

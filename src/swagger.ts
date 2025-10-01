@@ -1,29 +1,47 @@
-// src/swagger.ts
-import swaggerJSDoc from "swagger-jsdoc";
+import express from "express";
+import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { Express } from "express";
+import userRouter from "./routes/userPath";
+import cartRouter from "./routes/cartroutes";
 
-// Swagger definition
+const app = express();
+app.use(express.json());
+
+// Swagger setup
 const swaggerOptions = {
   definition: {
-    openapi: "3.0.0", // version
+    openapi: "3.0.0",
     info: {
-      title: "My API Documentation", // your API name
+      title: "My API",
       version: "1.0.0",
-      description: "This is the API documentation for my project",
     },
-    servers: [
-      {
-        url: "http://localhost:3000", // your backend base URL
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
       },
-    ],
+    },
+    security: [{ bearerAuth: [] }],
   },
-  // Path to your route files where Swagger will read JSDoc comments
-  apis: ["./src/routes/*.ts"], 
+  apis: ["./routes/*.ts"], // scans your route files
 };
 
-const swaggerSpec = swaggerJSDoc(swaggerOptions);
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
-export const setupSwagger = (app: Express) => {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-};
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocs, {
+    swaggerOptions: {
+      persistAuthorization: true, // keeps token stored
+    },
+  })
+);
+
+app.use("/users", userRouter);
+app.use("/cart", cartRouter);
+
+app.listen(3000, () => console.log("Server running on port 3000"));
